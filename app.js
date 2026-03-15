@@ -76,7 +76,7 @@ async function mainloop() {
 
         widget.style.display = "flex";
         fetch_pokemon_name(pokedex_id).then((name) => {
-          pokemonName.textContent = name;
+          pokemonName.textContent = `A wild ${name} has appeared in chat!`;
         });
 
         // Hide widget when catch window closes
