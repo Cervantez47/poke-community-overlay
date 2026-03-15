@@ -11,8 +11,7 @@
       false: Mute Audio.
 */
 
-const backend_url = "https://poketwitch.bframework.de/",
-  image_url = "https://dev.bframework.de/";
+const backend_url = "https://poketwitch.bframework.de/";
 
 const urlParams = new URLSearchParams(window.location.search),
   spawn = urlParams.get("spawn") ?? "pic",
@@ -30,10 +29,6 @@ var last_pokedex_id = 0,
 
 sAud1.volume = 0.1;
 sAud2.volume = 0.1;
-
-function display_image(string) {
-  sprite.src = image_url + string;
-}
 
 async function fetch_pokemon_name(id) {
   try {
@@ -77,13 +72,7 @@ async function mainloop() {
           }, 3000);
         }
 
-        if (spawn === "gif") {
-          display_image("static/pokedex/sprites/front/" + pokedex_id + ".gif");
-        } else {
-          display_image(
-            "static/pokedex/png-high-res-sprites/pokemon/" + order + ".png"
-          );
-        }
+        sprite.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokedex_id}.png`;
 
         widget.style.display = "flex";
         fetch_pokemon_name(pokedex_id).then((name) => {
