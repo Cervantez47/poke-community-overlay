@@ -12,8 +12,8 @@ body {
   position: fixed;
   top: 100px;
   left: 200px;
-  width: 160px;
-  height: 160px;
+  width: 320px;
+  height: 320px;
   object-fit: scale-down;
   filter: drop-shadow(1px 1px 2px #000);
   border: none;
