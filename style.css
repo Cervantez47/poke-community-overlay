@@ -16,6 +16,7 @@ body {
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  font-family: "Trebuchet MS", "Comic Sans MS", "Segoe UI", sans-serif;
 }
 fieldset {
   flex-direction: column;
@@ -23,17 +24,25 @@ fieldset {
   justify-content: center;
   padding: unset;
   margin: unset;
-  border-color: #fdc331;
-  border-radius: 10px;
+  border: 4px solid #5a3d35;
+  border-radius: 24px;
+  background: rgba(188, 203, 247, 0.9);
   aspect-ratio: 1 / 1;
   height: 146px;
-  filter: drop-shadow(0 1px 1px #000);
+  filter: drop-shadow(0 4px 5px rgba(0, 0, 0, 0.45));
 }
 legend {
-  margin: auto;
-  color: #fdc331;
-  filter: drop-shadow(0 1px #000);
-  height: 18px;
+  margin: 0 auto;
+  color: #4d3027;
+  height: 28px;
+  line-height: 28px;
+  background: #d7e2ff;
+  border: 3px solid #5a3d35;
+  border-radius: 14px;
+  padding: 0 12px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 legend:after {
   content: "Next Pokemon";
@@ -52,7 +61,8 @@ img {
 }
 h1 {
   margin: 0px;
-  color: #fdc331;
-  filter: drop-shadow(1px 1px 1px #000);
+  color: #4d3027;
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.5));
+  font-weight: 800;
   font-size: 2.5em;
 }
