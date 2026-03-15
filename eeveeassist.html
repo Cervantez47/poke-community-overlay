@@ -1,0 +1,184 @@
+<!doctype html>
+<!--
+  EeveeAssist Chat Query Overlay
+  ──────────────────────────────
+  Add this as a second Browser Source in OBS (on top of the main spawn overlay).
+  Size: 230 × 300 px recommended.
+
+  Required URL parameter:
+    ?server=https://your-railway-app.up.railway.app
+
+  Example:
+    file:///path/to/eeveeassist.html?server=https://eeveeassist.up.railway.app
+    https://your-gh-pages.github.io/poke-community-overlay/eeveeassist.html?server=https://eeveeassist.up.railway.app
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>EeveeAssist Overlay</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap"
+    />
+    <style>
+      :root {
+        --legend-color: #ffd1ec;
+        --stroke-color: #2f2f2f;
+        --font: "Fredoka", "Trebuchet MS", sans-serif;
+      }
+
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      html, body {
+        background: transparent;
+        overflow: hidden;
+        width: 230px;
+      }
+
+      #widget {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 230px;
+        padding: 8px 0 12px;
+        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+
+        /* hidden by default — JS toggles .visible */
+        opacity: 0;
+        transform: translateY(-12px);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+        pointer-events: none;
+      }
+
+      #widget.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      #widget.hiding {
+        opacity: 0;
+        transform: translateY(-12px);
+      }
+
+      #label {
+        font-family: var(--font);
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--legend-color);
+        letter-spacing: 0.4px;
+        margin-bottom: 4px;
+        -webkit-text-stroke: 0.5px var(--stroke-color);
+        text-shadow:
+          -1px -1px 0 var(--stroke-color),
+           1px -1px 0 var(--stroke-color),
+          -1px  1px 0 var(--stroke-color),
+           1px  1px 0 var(--stroke-color);
+      }
+
+      #artwork {
+        width: 150px;
+        height: 150px;
+        object-fit: contain;
+        image-rendering: auto;
+        filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.6));
+      }
+
+      #pokemon-name {
+        font-family: var(--font);
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--legend-color);
+        margin-top: 4px;
+        letter-spacing: 0.5px;
+        -webkit-text-stroke: 1px var(--stroke-color);
+        text-shadow:
+          -1px -1px 0 var(--stroke-color),
+           1px -1px 0 var(--stroke-color),
+          -1px  1px 0 var(--stroke-color),
+           1px  1px 0 var(--stroke-color),
+           0    2px 4px rgba(0,0,0,0.45);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="widget">
+      <div id="label">Chat asked about</div>
+      <img id="artwork" src="" alt="" />
+      <div id="pokemon-name"></div>
+    </div>
+
+    <script>
+      const DISPLAY_MS  = 8000; // how long to show the image before fading out
+      const ARTWORK_URL = id =>
+        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+
+      const widget      = document.getElementById('widget');
+      const artwork     = document.getElementById('artwork');
+      const nameLabel   = document.getElementById('pokemon-name');
+
+      let hideTimer = null;
+
+      function capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+      }
+
+      function showPokemon(id, name) {
+        // Cancel any pending hide
+        if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+
+        // Snap hide first if already visible so the new one animates in clean
+        if (widget.classList.contains('visible')) {
+          widget.classList.remove('visible');
+          widget.classList.add('hiding');
+          setTimeout(() => displayPokemon(id, name), 420);
+        } else {
+          displayPokemon(id, name);
+        }
+      }
+
+      function displayPokemon(id, name) {
+        artwork.src     = ARTWORK_URL(id);
+        nameLabel.textContent = capitalize(name);
+
+        widget.classList.remove('hiding');
+        // Force reflow so the transition fires
+        void widget.offsetWidth;
+        widget.classList.add('visible');
+
+        hideTimer = setTimeout(() => {
+          widget.classList.remove('visible');
+          widget.classList.add('hiding');
+          hideTimer = null;
+        }, DISPLAY_MS);
+      }
+
+      // ── SSE connection ──────────────────────────────────────────────────────
+      const serverUrl = new URLSearchParams(window.location.search).get('server') || '';
+
+      if (!serverUrl) {
+        console.warn('[EeveeAssist overlay] No ?server= param provided.');
+      } else {
+        function connect() {
+          const es = new EventSource(`${serverUrl}/events`);
+
+          es.onmessage = e => {
+            try {
+              const { id, name } = JSON.parse(e.data);
+              showPokemon(id, name);
+            } catch (err) {
+              console.error('[EeveeAssist overlay] parse error:', err);
+            }
+          };
+
+          es.onerror = () => {
+            es.close();
+            // EventSource auto-reconnects, but close + reopen for clean state
+            setTimeout(connect, 5000);
+          };
+        }
+
+        connect();
+      }
+    </script>
+  </body>
+</html>
