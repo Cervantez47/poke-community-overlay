@@ -1,0 +1,56 @@
+html {
+  /* Remove HTML on use */
+  background-color: #222;
+}
+body,
+fieldset,
+legend,
+img,
+h1 {
+  display: flex;
+  box-sizing: content-box;
+}
+body {
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+fieldset {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: unset;
+  margin: unset;
+  border-color: #fdc331;
+  border-radius: 10px;
+  aspect-ratio: 1 / 1;
+  height: 146px;
+  filter: drop-shadow(0 1px 1px #000);
+}
+legend {
+  margin: auto;
+  color: #fdc331;
+  filter: drop-shadow(0 1px #000);
+  height: 18px;
+}
+legend:after {
+  content: "Next Pokemon";
+}
+legend.catchPokemon:after {
+  content: "!pokecatch";
+}
+img {
+  height: 80px;
+  width: 80px;
+  object-fit: scale-down;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  filter: drop-shadow(1px 1px 1px #000);
+}
+h1 {
+  margin: 0px;
+  color: #fdc331;
+  filter: drop-shadow(1px 1px 1px #000);
+  font-size: 2.5em;
+}
