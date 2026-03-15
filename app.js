@@ -18,7 +18,9 @@ const urlParams = new URLSearchParams(window.location.search),
   spawn = urlParams.get("spawn") ?? "pic",
   audio = urlParams.get("audio") === "true";
 
-var sprite = document.getElementById("sprite-image"),
+var widget = document.getElementById("pokemon-widget"),
+  sprite = document.getElementById("sprite-image"),
+  pokemonName = document.getElementById("pokemon-name"),
   sAud1 = document.getElementById("audio-1"),
   sAud2 = document.getElementById("audio-2");
 var last_pokedex_id = 0,
@@ -31,6 +33,17 @@ sAud2.volume = 0.1;
 
 function display_image(string) {
   sprite.src = image_url + string;
+}
+
+async function fetch_pokemon_name(id) {
+  try {
+    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+    if (res.ok) {
+      const data = await res.json();
+      return data.name;
+    }
+  } catch {}
+  return "";
 }
 
 async function fetch_data() {
@@ -71,12 +84,17 @@ async function mainloop() {
             "static/pokedex/png-high-res-sprites/pokemon/" + order + ".png"
           );
         }
-        sprite.style.display = "block";
 
-        // Hide image when catch window closes
+        widget.style.display = "flex";
+        fetch_pokemon_name(pokedex_id).then((name) => {
+          pokemonName.textContent = name;
+        });
+
+        // Hide widget when catch window closes
         var hide_picture_seconds = next_spawn - 810;
         setTimeout(function () {
-          sprite.style.display = "none";
+          widget.style.display = "none";
+          pokemonName.textContent = "";
           if (audio) {
             sAud2.play();
           }
