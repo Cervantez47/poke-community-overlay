@@ -10,7 +10,7 @@ body {
 #sprite-image {
   display: none;
   position: fixed;
-  top: 200px;
+  top: 100px;
   left: 200px;
   width: 160px;
   height: 160px;
