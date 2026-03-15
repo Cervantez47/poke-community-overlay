@@ -1,15 +1,10 @@
 /* How To Use:
-  Use Any Mode and add parameters to the URL.
+  Add parameters to the URL.
   Params:
-  - spawn: Show/Hide the Spawn Image
-      No Param: Default Parameter set to 'pic'.
+  - spawn: Controls the Spawn Image type
+      No Param: Default set to 'pic'.
       gif: Show the Spawn GIF.
       pic: Show the Spawn IMG.
-      hide: Hide Spawn Image.
-  - timer: Show/Hide the Timer
-      No Param: Default Parameter shows the Timer.
-      true: Show Timer
-      false: Hide Timer
   - audio: Play/Mute Audio
       No Param: Default to Mute Audio.
       true: Play Audio.
@@ -21,12 +16,9 @@ const backend_url = "https://poketwitch.bframework.de/",
 
 const urlParams = new URLSearchParams(window.location.search),
   spawn = urlParams.get("spawn") ?? "pic",
-  timer = urlParams.get("timer") !== "false",
   audio = urlParams.get("audio") === "true";
 
 var sprite = document.getElementById("sprite-image"),
-  countdown = document.getElementById("countdown"),
-  legend = document.getElementById("legend"),
   sAud1 = document.getElementById("audio-1"),
   sAud2 = document.getElementById("audio-2");
 var last_pokedex_id = 0,
@@ -37,20 +29,8 @@ var last_pokedex_id = 0,
 sAud1.volume = 0.1;
 sAud2.volume = 0.1;
 
-if (spawn === "hide") {
-  sprite.style = "display:none;";
-}
-
-if (timer !== true) {
-  countdown.style = "display: none;";
-}
-
 function display_image(string) {
   sprite.src = image_url + string;
-}
-
-function str_pad_left(string, pad, length) {
-  return (new Array(length + 1).join(pad) + string).slice(-length);
 }
 
 async function fetch_data() {
@@ -65,7 +45,6 @@ async function fetch_data() {
       next_spawn = 0;
       pokedex_id = 0;
       order = 0;
-      display_image("static/pokedex/sprites/question512.png");
     });
 }
 
@@ -73,17 +52,8 @@ async function mainloop() {
   await fetch_data();
   function cooldown_wait() {
     if (next_spawn >= 0) {
-      if (timer) {
-        // setup timer
-        var minutes = Math.floor(next_spawn / 60);
-        var seconds = next_spawn - minutes * 60;
-
-        countdown.innerHTML =
-          str_pad_left(minutes, "0", 2) + ":" + str_pad_left(seconds, "0", 2);
-      }
-
       if (next_spawn > 810 && last_pokedex_id !== pokedex_id) {
-        // 13  minutes 30 seconds and different pokemon
+        // 13 minutes 30 seconds and different pokemon — catch window open
         last_pokedex_id = pokedex_id;
 
         if (audio) {
@@ -94,28 +64,23 @@ async function mainloop() {
           }, 3000);
         }
 
-        legend.classList.toggle("catchPokemon");
-
         if (spawn === "gif") {
           display_image("static/pokedex/sprites/front/" + pokedex_id + ".gif");
-        } else if (spawn === "pic") {
+        } else {
           display_image(
             "static/pokedex/png-high-res-sprites/pokemon/" + order + ".png"
           );
         }
+        sprite.style.display = "block";
 
-        // remove picture in 90 seconds
+        // Hide image when catch window closes
         var hide_picture_seconds = next_spawn - 810;
         setTimeout(function () {
-          legend.classList.toggle("catchPokemon");
-
-          display_image("static/pokedex/sprites/question512.png");
+          sprite.style.display = "none";
           if (audio) {
             sAud2.play();
           }
         }, hide_picture_seconds * 1000);
-
-        // reset image at 810 seconds
       }
       setTimeout(function () {
         cooldown_wait();
